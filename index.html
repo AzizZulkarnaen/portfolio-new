@@ -276,7 +276,6 @@
             position: relative;
             isolation: isolate; 
             overflow: hidden;
-            -webkit-mask-image: -webkit-radial-gradient(white, black); 
         }
         
         /* Animasi Pop-Out Hitam & Teks Putih */
@@ -348,7 +347,6 @@
             isolation: isolate; 
             overflow: hidden;
             background-clip: padding-box;
-            -webkit-mask-image: -webkit-radial-gradient(white, black); 
         }
         
         .p-card:hover { 
@@ -518,7 +516,7 @@
         <ul class="nav-menu-list">
             <li class="nav-item" onclick="scrollToSegment('#about')">About</li>
             <li class="nav-item" onclick="scrollToSegment('#skills')">Expertise</li>
-            <li class="nav-item" onclick="scrollToSegment('#projects-contact-trigger', 0)">Related Works</li>
+            <li class="nav-item" onclick="scrollToSegment('#projects-contact-trigger', 0)">Selected Works</li>
             <li class="nav-item" onclick="scrollToSegment('#projects-contact-trigger', 1)">Contact</li>
         </ul>
         <button class="nav-trigger-btn" aria-label="Open Menu">
@@ -779,7 +777,6 @@
         const projLayer = document.getElementById('projects-layer');
         const contLayer = document.getElementById('contact-layer');
         const hTrack = document.getElementById('horizontal-track');
-        
         const heroTitle = document.getElementById('hero-title');
         const heroImg = document.getElementById('hero-img');
 
