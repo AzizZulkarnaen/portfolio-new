@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aziz Zulkarnaen | Portfolio</title>
+    
+    <!-- Font Awesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;700;900&family=Caveat:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==============================================
+           1. RESET & BASE STYLES
+           ============================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { height: auto; }
+
+        :root {
+            /* TEMA TERANG 70% (SILVER / PLATINUM) */
+            --bg-color: #f2f2f2; 
+            --accent-blue: #0055ff; 
+            --font-display: 'Archivo Black', sans-serif;
+            --font-main: 'Inter', sans-serif;
+            --font-signature: 'Caveat', cursive;
+            --text-dark: #111111; 
+            --text-muted: #444444;
+            --glass-bg: rgba(255, 255, 255, 0.65); 
+            --glass-border: rgba(0, 0, 0, 0.08); 
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            overflow-x: hidden; 
+            position: relative;
+            overscroll-behavior: none; 
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body.locked { overflow: hidden; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #d0d0d0; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-blue); }
+
+        /* ==============================================
+           2. PRELOADER
+           ============================================== */
+        .preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            z-index: 10000; display: flex; justify-content: center; align-items: center;
+            pointer-events: all; 
+        }
+
+        .preloader-bg-top, .preloader-bg-bottom {
+            position: absolute; left: 0; width: 100%; height: 50vh;
+            background-color: #ffffff; z-index: 10000;
+            transition: transform 1.2s cubic-bezier(0.85, 0, 0.15, 1);
+        }
+        .preloader-bg-top { top: 0; transform-origin: top; }
+        .preloader-bg-bottom { bottom: 0; transform-origin: bottom; }
+
+        .preloader.hide .preloader-bg-top { transform: translateY(-100%); }
+        .preloader.hide .preloader-bg-bottom { transform: translateY(100%); }
+
+        .loader-content {
+            position: relative; z-index: 10001; display: flex; flex-direction: column; align-items: center;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .preloader.hide .loader-content { opacity: 0; transform: scale(0.9); }
+
+        .cyber-loader { display: flex; flex-direction: column; align-items: center; gap: 15px; opacity: 0; transform: translateY(20px); animation: fadeInLoader 0.8s ease forwards 0.2s; }
+        @keyframes fadeInLoader { to { opacity: 1; transform: translateY(0); } }
+
+        .cyber-percent { font-family: var(--font-display); font-size: clamp(4rem, 12vw, 8rem); color: #111; line-height: 1; letter-spacing: -2px; }
+        .cyber-bar { width: 250px; height: 4px; background-color: rgba(0,0,0,0.1); border-radius: 2px; overflow: hidden; position: relative; }
+        .cyber-fill { width: 0%; height: 100%; background-color: var(--accent-blue); transition: width 0.1s linear; box-shadow: 0 0 10px rgba(0,85,255,0.3); }
+
+        .cyber-text {
+            font-family: var(--font-main); font-size: 0.8rem; letter-spacing: 5px; font-weight: 700; color: #111; text-transform: uppercase; margin-top: 10px; animation: blinkText 1s infinite;
+        }
+        @keyframes blinkText { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        /* ==============================================
+           3. LATAR BELAKANG GLOBAL
+           ============================================== */
+        .global-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(230, 230, 230, 0.4), rgba(180, 180, 180, 0.6)), url('background.png') no-repeat center center;
+            background-size: cover; z-index: -2;
+            transition: opacity 0.5s ease;
+        }
+        .global-bg::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        .nuance-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color); 
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1; opacity: 0; transition: opacity 0.5s linear;
+        }
+
+        .main-container { width: 100%; display: flex; flex-direction: column; position: relative; z-index: 1; }
+
+        /* ==============================================
+           4. DYNAMIC SCROLL ELEMENTS
+           ============================================== */
+        .scroll-flow-diagonal-left, .scroll-flow-diagonal-right {
+            will-change: transform, opacity; 
+            opacity: 0;
+        }
+
+        .reveal-clip { opacity: 0; transform: translateY(40px); clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0% 100%); transition: all 1.4s cubic-bezier(0.85, 0, 0.15, 1); }
+        .reveal-clip.in-view { opacity: 1; transform: translateY(0); clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+
+        .reveal-hero {
+            opacity: 0; transform: translate(-50%, 40px); clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0% 100%); transition: all 1.4s cubic-bezier(0.85, 0, 0.15, 1);
+        }
+        .reveal-hero.in-view {
+            opacity: 1; transform: translate(-50%, 0); clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .delay-1 { transition-delay: 0.1s; } .delay-2 { transition-delay: 0.2s; } .delay-3 { transition-delay: 0.3s; }
+
+        /* ==============================================
+           5. STICKY HERO SECTION 
+           ============================================== */
+        #hero-trigger { height: 180vh; width: 100%; position: relative; } 
+
+        .sticky-hero {
+            position: sticky; top: 0; height: 100vh; width: 100%; overflow: hidden;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+
+        .giant-transition-text {
+            position: absolute; top: 50%; left: 0; width: 100vw; transform: translateY(-50%);
+            z-index: 2; opacity: 0; pointer-events: none; overflow: hidden;
+        }
+        .marquee-inner {
+            display: inline-block; white-space: nowrap;
+            font-family: var(--font-display); font-size: clamp(8rem, 20vw, 22rem); color: transparent;
+            -webkit-text-stroke: 2px rgba(0,0,0,0.05); 
+            animation: marqueeScroll 25s linear infinite;
+        }
+        @keyframes marqueeScroll {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .js-hero-scale-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 3;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transform-origin: center center; will-change: transform, filter; background-color: transparent; border-radius: 20px;
+        }
+
+        .ticker-wrap { position: absolute; top: 5vh; width: 100%; overflow: hidden; white-space: nowrap; pointer-events: none; }
+        .ticker-text {
+            display: inline-block; white-space: nowrap; padding-right: 100%;
+            animation: ticker 30s linear infinite; font-family: var(--font-display);
+            font-size: 5rem; color: transparent; -webkit-text-stroke: 1px rgba(0,0,0,0.1); letter-spacing: 5px;
+        }
+        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        .hero-title-intro {
+            font-family: var(--font-display); font-size: clamp(3.5rem, 11vw, 10rem); text-align: center; line-height: 0.9; text-transform: uppercase;
+            letter-spacing: -3px; color: var(--text-dark); z-index: 4; margin-top: 5vh; margin-bottom: 20vh; width: 100%;
+            will-change: opacity;
+        }
+
+        .hero-img-intro {
+            position: absolute; bottom: 0; left: 50%; height: 95vh; z-index: 5; 
+            will-change: opacity;
+        }
+
+        .hero-signature {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8);
+            font-family: var(--font-signature); font-size: clamp(4rem, 10vw, 7rem);
+            color: var(--accent-blue); z-index: 6; opacity: 0; pointer-events: none;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.1); white-space: nowrap; will-change: transform, filter, letter-spacing, opacity;
+        }
+
+        .scroll-hint-wrapper { position: absolute; bottom: 40px; left: 40px; z-index: 7; }
+        .scroll-hint { font-size: 0.8rem; letter-spacing: 5px; font-weight: bold; color: var(--text-muted); animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
+
+        /* ==============================================
+           6. KONTEN UMUM 
+           ============================================== */
+        .glass-section {
+            width: 100%; 
+            height: 100vh; 
+            padding: 0 5%; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            position: relative; z-index: 10;
+        }
+
+        .glass-wrapper { width: 100%; max-width: 1200px; position: relative; }
+
+        .section-header {
+            font-family: var(--font-display); font-size: clamp(2.5rem, 5vw, 4rem); color: var(--text-dark); text-transform: uppercase; letter-spacing: -2px; 
+            margin-bottom: 20px; 
+        }
+        .section-header span { color: var(--accent-blue); }
+
+        /* ----------------------------------------------
+           7A. ABOUT SECTION (\ Diagonal)
+           ---------------------------------------------- */
+        .about-content-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+        
+        .about-grid-new {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            column-gap: 60px;
+            align-items: stretch; /* MEMAKSA SEMUA ANAK STRETCH */
+        }
+
+        .about-headline-new {
+            font-size: clamp(1.8rem, 3vw, 2.5rem); 
+            font-weight: 500; 
+            color: var(--text-dark); 
+            line-height: 1.3; 
+            font-family: var(--font-main);
+            margin: 0;
+            letter-spacing: -0.5px;
+            max-width: 95%;
+        }
+
+        .bento-unified-photo {
+            border-radius: 12px; overflow: hidden; height: 100%; min-height: 350px; background-color: #dadada;
+            position: relative;
+        }
+        .about-photo-label {
+            position: absolute; top: 15px; left: 15px; font-size: 0.9rem; color: #333; font-family: var(--font-main); z-index: 3;
+        }
+        .bento-unified-photo img {
+            width: 100%; height: 100%; object-fit: cover; 
+            position: absolute; top: 0; left: 0; /* REVISI: Dipaksa Absolut agar mengikuti tinggi container */
+            z-index: 2; transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .bento-unified-photo:hover img { transform: scale(1.02); }
+
+        .bento-text { font-size: 1.05rem; line-height: 1.7; color: #222; display: flex; flex-direction: column; gap: 20px; }
+        .bento-text strong { color: var(--accent-blue); font-weight: 700; }
+
+        /* ----------------------------------------------
+           7B. PROGRESS BARS (SKILLS/EXPERTISE) 
+           ---------------------------------------------- */
+        .skills-container { 
+            display: flex; flex-direction: column; gap: 15px; 
+            width: 100%; max-width: 900px; margin: 0 auto;
+        }
+
+        .skill-row {
+            background: #ffffff; 
+            border: 1px solid rgba(0,0,0,0.05); 
+            border-radius: 20px; 
+            padding: 25px 35px; 
+            display: flex; flex-direction: column; gap: 8px;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            position: relative;
+            isolation: isolate; 
+            overflow: hidden;
+            -webkit-mask-image: -webkit-radial-gradient(white, black); 
+        }
+        
+        /* Animasi Pop-Out Hitam & Teks Putih */
+        .skill-row:hover { 
+            background: #111111;
+            border-color: transparent; 
+            transform: translateY(-10px) translateZ(0); 
+            box-shadow: 
+                0 20px 40px rgba(0, 85, 255, 0.3), 
+                0 10px 20px rgba(0, 85, 255, 0.2); 
+        }
+
+        .skill-row:hover .s-title,
+        .skill-row:hover .s-desc {
+            color: #ffffff;
+        }
+
+        .s-head { display: flex; justify-content: space-between; align-items: center; }
+        .s-title { font-family: var(--font-display); font-size: 1.1rem; color: var(--text-dark); transition: color 0.4s ease; }
+        .s-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; transition: color 0.4s ease; }
+        
+        .s-bar-bg { width: 100%; height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden; margin-top: 5px; }
+        
+        .s-bar-fill { 
+            height: 100%; background: var(--accent-blue); border-radius: 3px; box-shadow: 0 0 15px var(--accent-blue); 
+            transform: scaleX(0); transform-origin: left; transition: transform 1.5s cubic-bezier(0.85, 0, 0.15, 1); 
+        }
+        .skill-row.in-view .s-bar-fill { transform: scaleX(1); }
+
+        /* ----------------------------------------------
+           7C & 7D. UNIFIED PROJECTS + CONTACT
+           ---------------------------------------------- */
+        #projects-contact-trigger {
+            height: 800vh; 
+            width: 100%; 
+            position: relative; 
+            z-index: 11; 
+            margin: 0;
+        }
+
+        .dual-sticky-viewport {
+            position: sticky; top: 0; height: 100vh; width: 100%; overflow: hidden;
+            display: flex; align-items: center; 
+        }
+
+        #projects-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; 
+            will-change: transform, opacity;
+            display: flex; align-items: center; justify-content: flex-start; padding: 0 5%;
+        }
+
+        .horizontal-track {
+            display: flex; gap: 50px; width: max-content; align-items: center; will-change: transform;
+        }
+
+        .h-header-wrapper { width: max-content; padding-right: 80px; flex-shrink: 0; }
+        .h-header-wrapper .section-header { font-size: clamp(4rem, 10vw, 8rem); line-height: 0.9; margin: 0; white-space: nowrap; }
+
+        .p-card {
+            width: 420px; height: 500px; flex-shrink: 0; 
+            background: #ffffff; 
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 40px; 
+            padding: 45px; 
+            position: relative; 
+            display: flex; flex-direction: column; gap: 15px;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.02); 
+            isolation: isolate; 
+            overflow: hidden;
+            background-clip: padding-box;
+            -webkit-mask-image: -webkit-radial-gradient(white, black); 
+        }
+        
+        .p-card:hover { 
+            background: #111111;
+            border-color: transparent; 
+            transform: translateY(-20px) translateZ(0); 
+            box-shadow: 
+                0 30px 60px rgba(0, 85, 255, 0.3), 
+                0 15px 30px rgba(0, 85, 255, 0.2),
+                0 60px 100px rgba(0, 85, 255, 0.1); 
+        }
+
+        .p-card:hover .p-title,
+        .p-card:hover .p-desc,
+        .p-card:hover .p-role {
+            color: #ffffff !important;
+        }
+        
+        .p-card:hover .p-num {
+            color: rgba(255, 255, 255, 0.05);
+        }
+
+        .p-num { font-family: var(--font-display); font-size: 10rem; color: rgba(0,0,0,0.03); position: absolute; top: 5px; right: 25px; line-height: 0.8; z-index: 0; pointer-events: none; user-select: none; transition: color 0.4s ease; }
+
+        .p-title { font-size: 2.2rem; font-family: var(--font-display); color: var(--text-dark); margin-top: 25px; z-index: 2; position: relative; line-height: 1.1; letter-spacing: -1px; transition: color 0.4s ease; }
+        .p-desc { font-size: 1.05rem; line-height: 1.65; color: var(--text-muted); z-index: 2; position: relative; margin-top: 5px; transition: color 0.4s ease; }
+        .p-role { font-size: 0.9rem; font-weight: 800; color: var(--accent-blue); margin-top: auto; padding-top: 25px; border-top: 1.5px solid rgba(255,255,255,0.1); z-index: 2; position: relative; text-transform: uppercase; letter-spacing: 2px; transition: all 0.4s ease; }
+
+        /* LAYER CONTACT (EDITORIAL REDESIGN) */
+        #contact-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; 
+            opacity: 0; transform: scale(0.9); pointer-events: none;
+            display: flex; justify-content: center; align-items: center;
+            will-change: transform, opacity;
+            padding: 0 5%;
+        }
+
+        .contact-watermark {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-family: var(--font-display); font-size: 25vw; color: rgba(0,0,0,0.02);
+            z-index: 0; pointer-events: none; user-select: none; white-space: nowrap;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 100px;
+            width: 100%;
+            max-width: 1200px;
+            z-index: 2;
+            align-items: center;
+        }
+
+        .c-left-side { display: flex; flex-direction: column; gap: 30px; }
+        .c-availability { 
+            display: flex; align-items: center; gap: 10px; 
+            font-size: 0.8rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-blue);
+        }
+        .c-dot-pulse { width: 8px; height: 8px; background: var(--accent-blue); border-radius: 50%; box-shadow: 0 0 10px var(--accent-blue); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
+
+        .c-headline { 
+            font-size: clamp(2.5rem, 5vw, 4.5rem); font-family: var(--font-display); 
+            line-height: 1; color: var(--text-dark); margin: 0; letter-spacing: -2px;
+        }
+
+        .c-right-side { display: flex; flex-direction: column; gap: 50px; }
+        
+        .c-info-block { display: flex; flex-direction: column; gap: 15px; }
+        .c-info-label { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 3px; color: var(--text-muted); }
+        
+        .c-socials { display: flex; gap: 20px; }
+        .c-soc-btn {
+            width: 65px; height: 65px; border-radius: 50%; background: #ffffff; border: 1px solid rgba(0,0,0,0.05);
+            display: flex; justify-content: center; align-items: center; color: var(--text-dark); font-size: 1.6rem; text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+        }
+        .c-soc-btn:hover { 
+            background: #111; color: #fff; transform: translateY(-8px); 
+            box-shadow: 0 15px 30px rgba(0, 85, 255, 0.25), 0 5px 15px rgba(0, 85, 255, 0.1); 
+        }
+
+        /* REVISI: Hapus Garis di Bawah Segmen Contact */
+        .c-footer { display: flex; justify-content: space-between; align-items: center; border-top: none !important; padding-top: 30px; }
+        .c-time { font-family: var(--font-display); font-size: 0.9rem; color: var(--text-dark); }
+        .back-to-top {
+            font-family: var(--font-display); font-size: 0.8rem; color: var(--text-muted); 
+            text-transform: uppercase; cursor: pointer; letter-spacing: 2px; text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .back-to-top:hover { color: var(--accent-blue); letter-spacing: 4px; }
+
+        /* ==============================================
+           7E. FLOATING NAV MENU (REVISI POSISI)
+           ============================================== */
+        .floating-nav-container {
+            position: fixed; 
+            bottom: 25px; 
+            right: 25px;  
+            z-index: 1000;
+            width: 65px; 
+            height: 65px; 
+            display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end;
+            pointer-events: auto;
+        }
+
+        .nav-menu-list {
+            position: absolute; bottom: 80px; right: 0;
+            display: grid; grid-template-columns: repeat(2, auto); gap: 12px; 
+            list-style: none; opacity: 0; visibility: hidden;
+            transform: scale(0.9) translateY(20px); pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); transform-origin: bottom right; width: max-content;
+        }
+
+        .nav-menu-list::before { content: ''; position: absolute; bottom: -30px; right: 0; width: 100%; height: 30px; background: transparent; }
+
+        .floating-nav-container:hover .nav-menu-list { opacity: 1; visibility: visible; transform: scale(1) translateY(0); pointer-events: all; }
+
+        .nav-item {
+            background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border); padding: 12px 25px; border-radius: 15px; cursor: pointer; color: var(--text-dark);
+            font-family: var(--font-display); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; text-align: center; 
+            white-space: nowrap; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .nav-item:hover { background: var(--accent-blue); color: #fff; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 85, 255, 0.2); border-color: transparent; }
+
+        .nav-trigger-btn {
+            width: 65px; height: 65px; border-radius: 50%; background: #111; border: none; cursor: pointer;
+            display: flex; justify-content: center; align-items: center; color: #fff; font-size: 1.5rem; 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative; z-index: 1001; pointer-events: auto;
+        }
+        .floating-nav-container:hover .nav-trigger-btn { transform: rotate(90deg) scale(0.9); background: var(--accent-blue); }
+
+        /* ==============================================
+           8. RESPONSIVE MOBILE
+           ============================================== */
+        @media (max-width: 1024px) {
+            .about-grid-new { grid-template-columns: 1fr; row-gap: 25px; align-items: start; }
+            .bento-unified-photo { height: 300px; margin-bottom: 20px; }
+            .bento-unified-photo img { position: relative; }
+            .contact-grid { grid-template-columns: 1fr; gap: 50px; text-align: center; }
+            .c-left-side, .c-right-side { align-items: center; }
+            .c-socials { justify-content: center; }
+        }
+
+        @media (max-width: 768px) {
+            .glass-section { height: auto; min-height: 100vh; padding: 100px 5%; }
+            #projects-contact-trigger { height: auto !important; margin: 0 !important; }
+            .dual-sticky-viewport { position: relative !important; height: auto !important; display: block !important; padding: 100px 5% !important; overflow: visible;}
+            #projects-layer { position: relative !important; display: block !important; transform: none !important; opacity: 1 !important; filter: none !important;}
+            #contact-layer { position: relative !important; display: flex !important; transform: none !important; opacity: 1 !important; pointer-events: auto !important; padding-top: 100px;}
+            .horizontal-track { display: flex; flex-direction: column; width: 100% !important; transform: none !important; padding: 0 !important; gap: 30px;}
+            .p-card { width: 100% !important; height: auto; min-height: 400px;}
+            .floating-nav-container { right: 15px; bottom: 15px; }
+            .nav-trigger-btn { width: 55px; height: 55px; }
+            .nav-menu-list { grid-template-columns: 1fr; bottom: 70px;} 
+        }
+    </style>
+</head>
+<body class="locked">
+
+    <div class="nuance-bg" id="nuance-bg"></div>
+
+    <nav class="floating-nav-container">
+        <ul class="nav-menu-list">
+            <li class="nav-item" onclick="scrollToSegment('#about')">About</li>
+            <li class="nav-item" onclick="scrollToSegment('#skills')">Expertise</li>
+            <li class="nav-item" onclick="scrollToSegment('#projects-contact-trigger', 0)">Related Works</li>
+            <li class="nav-item" onclick="scrollToSegment('#projects-contact-trigger', 1)">Contact</li>
+        </ul>
+        <button class="nav-trigger-btn" aria-label="Open Menu">
+            <i class="fa-solid fa-bars-staggered"></i>
+        </button>
+    </nav>
+
+    <div class="preloader" id="preloader">
+        <div class="preloader-bg-top"></div>
+        <div class="preloader-bg-bottom"></div>
+        <div class="loader-content">
+            <div class="cyber-loader">
+                <div class="cyber-percent" id="loader-percent">0%</div>
+                <div class="cyber-bar"><div class="cyber-fill" id="loader-fill"></div></div>
+                <div class="cyber-text" id="loader-text">CONNECTING TO SERVER...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="global-bg" id="bgLayer"></div>
+
+    <div class="main-container" id="top">
+        
+        <!-- 1. HERO SECTION -->
+        <div id="hero-trigger">
+            <section class="sticky-hero">
+                <div class="giant-transition-text" id="giant-text">
+                    <div class="marquee-inner">ABOUT ME • ABOUT ME • ABOUT ME • ABOUT ME • ABOUT ME • ABOUT ME • </div>
+                </div>
+                
+                <div class="js-hero-scale-layer" id="hero-scale-layer">
+                    <div class="ticker-wrap" id="hero-ticker">
+                        <div class="ticker-text">
+                            // FULLSTACK DEVELOPER // CREATIVE THINKER // PROBLEM SOLVER // FULLSTACK DEVELOPER // CREATIVE THINKER // PROBLEM SOLVER
+                        </div>
+                    </div>
+                    <h1 class="hero-title-intro reveal-clip" id="hero-title">MUHAMMAD ABDUL AZIZ ZULKARNAEN</h1>
+                    <img src="aziz-transparan.png" alt="Aziz" class="hero-img-intro reveal-hero delay-1" id="hero-img">
+                </div>
+
+                <div class="hero-signature" id="hero-signature">Aziz</div>
+                <div class="scroll-hint-wrapper reveal-clip delay-2" id="hero-hint">
+                    <div class="scroll-hint">SCROLL TO EXPLORE ↓</div>
+                </div>
+            </section>
+        </div>
+
+        <!-- 2. ABOUT SECTION -->
+        <section id="about" class="glass-section">
+            <div class="glass-wrapper scroll-flow-diagonal-left">
+                <h1 class="section-header"><span>/</span> About</h1>
+                <div class="about-content-wrapper">
+                    <h2 class="about-headline-new">
+                        Passion. Consistency. Growth. These are just some of the qualities that make Muhammad Abdul Aziz Zulkarnaen, born on 2006, a driven Computer Science student at Binus University.
+                    </h2>
+                    <div class="about-grid-new">
+                        <div class="bento-unified-photo">
+                            <div class="about-photo-label"></div>
+                            <img src="IMG_9460.jpg" alt="Aziz Profile">
+                        </div>
+                        <div class="bento-text">
+                            <p>I'm a 19-year-old developer with a strong interest in fullstack development. I enjoy building digital solutions that are not only functional, but also meaningful and impactful. I've developed projects such as an AI-powered website for pneumonia detection — a project that reflects my interest in combining technology with real-world problem solving.</p>
+                            <p>My approach is calm but driven. I stay consistent, keep learning, and push myself to improve with every project I take on. I believe growth isnt about sudden breakthroughs, but about showing up and getting better every day.</p>
+                            <p>My goal is pretty simple: to become a better version of myself, both as a developer and as a person, while creating work that stands out and makes a difference.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SKILLS SECTION -->
+        <section id="skills" class="glass-section">
+            <div class="glass-wrapper scroll-flow-diagonal-left">
+                <h1 class="section-header"><span>/</span> Expertise</h1>
+                <div class="skills-container">
+                    <div class="skill-row">
+                        <div class="s-head"><h3 class="s-title">Frontend Development</h3></div>
+                        <p class="s-desc">Responsive and visually clean interfaces using HTML, CSS, JS. Focusing on smooth UX and structured layouts.</p>
+                        <div class="s-bar-bg"><div class="s-bar-fill" style="width: 100%; transition-duration: 1.2s;"></div></div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="s-head"><h3 class="s-title">UI/UX Design</h3></div>
+                        <p class="s-desc">Designing intuitive and user-centered interfaces with a focus on usability, visual hierarchy, and user experience.</p>
+                        <div class="s-bar-bg"><div class="s-bar-fill" style="width: 100%; transition-duration: 1.0s;"></div></div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="s-head"><h3 class="s-title">Backend & Logic</h3></div>
+                        <p class="s-desc">Fullstack enthusiast. Handling logic, structure, and ensuring systems run efficiently behind the scenes.</p>
+                        <div class="s-bar-bg"><div class="s-bar-fill" style="width: 100%; transition-duration: 1.4s;"></div></div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="s-head"><h3 class="s-title">Problem Solving</h3></div>
+                        <p class="s-desc">Breaking down complex ideas into simple, functional solutions that actually work in real-world scenarios.</p>
+                        <div class="s-bar-bg"><div class="s-bar-fill" style="width: 100%; transition-duration: 1.6s;"></div></div>
+                    </div>
+                    <div class="skill-row">
+                        <div class="s-head"><h3 class="s-title">Continuous Learning</h3></div>
+                        <p class="s-desc">Technology evolves fast. I consistently explore new concepts and adapt to new challenges to stay relevant.</p>
+                        <div class="s-bar-bg"><div class="s-bar-fill" style="width: 100%; transition-duration: 1.8s;"></div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4 & 5. UNIFIED TRANSITION -->
+        <div id="projects-contact-trigger">
+            <div class="dual-sticky-viewport">
+                <!-- CONTACT LAYER -->
+                <section id="contact-layer">
+                    <div class="contact-watermark">CONNECT</div>
+                    
+                    <div class="contact-grid">
+                        <div class="c-left-side">
+                            <div class="c-availability">
+                                <div class="c-dot-pulse"></div> Computer Science Student
+                            </div>
+                            <h2 class="c-headline">Ready to start your next digital journey?</h2>
+                            <p style="color: var(--text-muted); font-size: 1.1rem; line-height: 1.6;">Whether you have a specific idea or just want to explore possibilities, I'm here to help you build something meaningful.</p>
+                        </div>
+
+                        <div class="c-right-side">
+                            <div class="c-info-block">
+                                <span class="c-info-label">Get in Touch</span>
+                                <div class="c-socials">
+                                    <a href="mailto:azizabdul9982@gmail.com.com" class="c-soc-btn" title="Email"><i class="fa-solid fa-envelope"></i></a>
+                                    <a href="https://wa.me/+6281999275274" target="_blank" class="c-soc-btn" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                                    <a href="https://www.instagram.com/aazizzulkarnaen?igsh=MWM2dXFjNjg5ZGI1YQ%3D%3D&utm_source=qr&wa_status_inline=true" target="_blank" class="c-soc-btn" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                                </div>
+                                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px; font-weight: 500;">Let's build something meaningful together.</p>
+                            </div>
+
+                            <div class="c-footer">
+                                <div class="c-time" id="local-time">00:00:00 (GMT+7)</div>
+                                <a href="#top" class="back-to-top" onclick="window.scrollTo(0,0); return false;">[ RETURN TO TOP ]</a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+               <!-- PROJECTS LAYER -->
+                <section id="projects-layer">
+                    <div class="horizontal-track" id="horizontal-track">
+                        <div class="h-header-wrapper reveal-clip delay-1">
+                            <h1 class="section-header"><span>/</span> Selected<br>Works</h1>
+                        </div>
+                        <div class="p-card reveal-clip delay-1">
+                            <div class="p-num">01</div>
+                            <h3 class="p-title">AI Pneumonia Detection</h3>
+                            <p class="p-desc">A web application assisting in pneumonia detection using AI. Combines web dev with machine learning for an accessible early detection tool.</p>
+                            <div class="p-role">UI / UX Design</div>
+                        </div>
+                        <div class="p-card reveal-clip delay-2">
+                            <div class="p-num">02</div>
+                            <h3 class="p-title">Food Trading Website</h3>
+                            <p class="p-desc">A web platform facilitating online food trading, allowing users to browse products, view details, and interact efficiently.</p>
+                            <div class="p-role">Structured UI / UX Design</div>
+                        </div>
+                        <div class="p-card reveal-clip delay-3">
+                            <div class="p-num">03</div>
+                            <h3 class="p-title">Building Materials Store</h3>
+                            <p class="p-desc">A website for a construction store, aimed at showcasing products and simplifying the process of browsing and selecting items.</p>
+                            <div class="p-role">Simplicity & Usability Focus</div>
+                        </div>
+                        <div class="p-card reveal-clip delay-4">
+                            <div class="p-num">04</div>
+                            <h3 class="p-title">Personal Portfolio</h3>
+                            <p class="p-desc">A responsive portfolio built to showcase my work and growth. Designed with a clean, modern, and futuristic approach.</p>
+                            <div class="p-role">Front-End Development</div>
+                        </div>
+                        <div class="p-card reveal-clip delay-5">
+                            <div class="p-num">05</div>
+                            <h3 class="p-title">Boarding House Platform</h3>
+                            <p class="p-desc">A web-based platform designed to simplify finding and managing boarding houses (kos-kosan), featuring room listings, details, and booking convenience.</p>
+                            <div class="p-role">Web Design & Development</div>
+                        </div>
+                        <div class="p-card reveal-clip delay-6">
+                            <div class="p-num">06</div>
+                            <h3 class="p-title">Tiki Bali Website</h3>
+                            <p class="p-desc">A dedicated web platform tailored for Tiki Bali, showcasing authentic cultural services, information, and seamless digital interaction for users.</p>
+                            <div class="p-role">Web Design & Development</div>
+                        </div>
+                        <div style="width: 10vw; flex-shrink: 0;"></div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.39/dist/lenis.min.js"></script>
+    <script>
+        const lenis = new Lenis({ lerp: 0.07, wheelMultiplier: 1, smoothWheel: true });
+        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+        requestAnimationFrame(raf);
+        lenis.stop();
+
+        function updateTime() {
+            const timeEl = document.getElementById('local-time');
+            if(!timeEl) return;
+            const now = new Date();
+            timeEl.innerText = now.toLocaleTimeString('id-ID') + " (GMT+7)";
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        const preloader = document.getElementById('preloader');
+        const percentText = document.getElementById('loader-percent');
+        const fillBar = document.getElementById('loader-fill');
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.floor(Math.random() * 15) + 2; 
+            if (progress >= 100) {
+                progress = 100; percentText.innerText = progress + '%';
+                fillBar.style.width = progress + '%'; clearInterval(interval);
+                setTimeout(() => {
+                    preloader.classList.add('hide'); 
+                    setTimeout(() => {
+                        preloader.style.display = 'none'; document.body.classList.remove('locked'); 
+                        lenis.start(); initObserver();
+                    }, 800); 
+                }, 600);
+            } else {
+                percentText.innerText = progress + '%'; fillBar.style.width = progress + '%';
+            }
+        }, 80); 
+
+        function initObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('in-view');
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal-clip, .reveal-hero, .skill-row').forEach(el => observer.observe(el));
+        }
+
+        const scrollDiagLeftEls = document.querySelectorAll('.scroll-flow-diagonal-left');
+        function updateFlowAnimations() {
+            const wh = window.innerHeight;
+            scrollDiagLeftEls.forEach(el => {
+                const rect = el.getBoundingClientRect();
+                const totalScroll = wh + rect.height;
+                const currentScroll = wh - rect.top;
+                let scrollProgress = currentScroll / totalScroll;
+                if (scrollProgress < -0.3 || scrollProgress > 1.3) return;
+                let factor = 0.5 - scrollProgress; 
+                el.style.transform = `translate(${factor * 400}px, ${factor * 300}px)`;
+                let opacity = scrollProgress < 0.25 ? scrollProgress / 0.25 : (scrollProgress > 0.75 ? (1 - scrollProgress) / 0.25 : 1);
+                el.style.opacity = Math.max(0, Math.min(1, opacity));
+            });
+        }
+
+        const bgLayer = document.getElementById('bgLayer');
+        const heroTrigger = document.getElementById('hero-trigger');
+        const scaleLayer = document.getElementById('hero-scale-layer');
+        const giantText = document.getElementById('giant-text');
+        const signature = document.getElementById('hero-signature');
+        const nuanceBg = document.getElementById('nuance-bg');
+        const pcTrigger = document.getElementById('projects-contact-trigger');
+        const projLayer = document.getElementById('projects-layer');
+        const contLayer = document.getElementById('contact-layer');
+        const hTrack = document.getElementById('horizontal-track');
+        
+        const heroTitle = document.getElementById('hero-title');
+        const heroImg = document.getElementById('hero-img');
+
+        window.addEventListener('scroll', () => {
+            requestAnimationFrame(() => {
+                let scrollY = window.scrollY;
+                let wh = window.innerHeight;
+                updateFlowAnimations();
+
+                if (heroTrigger) {
+                    let hHeight = heroTrigger.offsetHeight - wh; 
+                    if (scrollY <= hHeight && scrollY >= 0) {
+                        let progress = scrollY / hHeight; 
+                        scaleLayer.style.transform = `scale(${Math.max(0.3, 1 - progress * 1.5)})`;
+                        scaleLayer.style.opacity = Math.max(0.2, 1 - progress * 1.2);
+                        
+                        let elementFade = Math.max(0, 1 - progress * 2.5);
+                        if(heroTitle) heroTitle.style.opacity = elementFade;
+                        if(heroImg) heroImg.style.opacity = elementFade;
+
+                        giantText.style.opacity = Math.min(1, progress * 3);
+                        let sigProgress = Math.min(1, Math.max(0, (progress - 0.35) * 2.5)); 
+                        signature.style.opacity = sigProgress;
+                        signature.style.transform = `translate(-50%, -50%) scale(${2.5 - (sigProgress * 1.5)})`;
+                        
+                        bgLayer.style.opacity = Math.max(0, 1 - progress * 1.5);
+                        nuanceBg.style.opacity = Math.min(1, progress * 1.5);
+                    } else if (scrollY > hHeight) {
+                        if(heroTitle) heroTitle.style.opacity = 0;
+                        if(heroImg) heroImg.style.opacity = 0;
+                        bgLayer.style.opacity = 0;
+                        nuanceBg.style.opacity = 1;
+                    }
+                }
+
+                if (pcTrigger && projLayer && contLayer && hTrack && window.innerWidth > 768) {
+                    const rect = pcTrigger.getBoundingClientRect();
+                    const triggerTop = rect.top; 
+                    const maxScroll = rect.height - wh; 
+                    if (triggerTop <= 0 && triggerTop >= -maxScroll) {
+                        const scrolled = Math.abs(triggerTop);
+                        const horizontalDist = wh * 5; 
+                        const tiltDist = maxScroll - horizontalDist; 
+                        if (scrolled <= horizontalDist) {
+                            let hProgress = scrolled / horizontalDist;
+                            hTrack.style.transform = `translateX(-${hProgress * (hTrack.scrollWidth - window.innerWidth)}px)`;
+                            projLayer.style.transform = `translate(0vw, 0vh)`;
+                            projLayer.style.opacity = 1;
+                            contLayer.style.opacity = 0;
+                            contLayer.style.transform = `translate(100vw, -100vh) scale(0.9)`;
+                        } else {
+                            let tProgress = (scrolled - horizontalDist) / tiltDist; 
+                            let easeT = tProgress < 0.5 ? 2 * tProgress * tProgress : -1 + (4 - 2 * tProgress) * tProgress;
+                            projLayer.style.transform = `translate(${easeT * -100}vw, ${easeT * 100}vh)`;
+                            projLayer.style.opacity = Math.max(0, 1 - (easeT * 1.8)); 
+                            contLayer.style.opacity = Math.min(1, easeT * 1.2);
+                            contLayer.style.transform = `translate(${(1 - easeT) * 100}vw, ${(1 - easeT) * -100}vh) scale(${0.9 + (easeT * 0.1)})`;
+                            contLayer.style.pointerEvents = tProgress > 0.5 ? 'auto' : 'none';
+                        }
+                    }
+                }
+            });
+        });
+
+        function scrollToSegment(selector, subProgress = null) {
+            const target = document.querySelector(selector);
+            if (!target) return;
+            if (selector === '#projects-contact-trigger' && subProgress !== null) {
+                const rect = target.getBoundingClientRect();
+                const triggerTop = window.scrollY + rect.top;
+                const wh = window.innerHeight;
+                if (subProgress === 0) {
+                    lenis.scrollTo(triggerTop + (wh * 2.5), { duration: 2.5, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+                } else {
+                    lenis.scrollTo(triggerTop + (target.offsetHeight - wh), { duration: 3, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+                }
+            } else {
+                lenis.scrollTo(target, { duration: 2, offset: -50, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+            }
+        }
+    </script>
+</body>
+</html>
